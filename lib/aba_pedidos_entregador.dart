@@ -138,4 +138,3 @@ class _AbaPedidosEntregadorState extends State<AbaPedidosEntregador> {
     }
   }
 }
-                        
