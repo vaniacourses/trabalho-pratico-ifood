@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:projetofinal/BD.dart'; 
+import 'package:projetofinal/BD.dart'; //Banco de dados
 
 // Modelo de dados para um Pedido
 class Pedido {
