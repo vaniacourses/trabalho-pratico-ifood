@@ -163,18 +163,20 @@ class DBADMN {
       await db.insert('item', item, conflictAlgorithm: ConflictAlgorithm.ignore);
     }
   }
-
-  Future<bool> insertUser(String name, String email, String password) async {
-    final db = await _db;
-    await db.insert(
-      '"user"',
-      {'name': name, 'email': email, 'password': password},
-      conflictAlgorithm: ConflictAlgorithm.replace,
-    );
-    print('User inserted');
-    return true;
-  }
-
+Future<bool> insertUser(String name, String email, String password, bool isEntregador) async {
+  final db = await initializeDatabase();
+  await db.insert(
+      '"user"', {
+        'name': name, 
+        'email': email, 
+        'password': password,
+        // Converte o booleano para inteiro (0 ou 1) para salvar no banco
+        'is_entregador': isEntregador ? 1 : 0
+      },
+      conflictAlgorithm: ConflictAlgorithm.replace);
+  print('User inserted');
+  return true;
+}
   Future<Map<String, dynamic>?> checkCredentials(String name, String password) async {
     final db = await _db;
     final result = await db.query(
@@ -319,4 +321,6 @@ class DBADMN {
     );
     print('Property updated');
   }
+  
+  Future initializeDatabase() async {}
 }
