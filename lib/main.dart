@@ -1,15 +1,15 @@
-import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
-import 'package:sqflite_common_ffi/sqflite_ffi.dart';
-import 'package:sqflite_common_ffi_web/sqflite_ffi_web.dart';
 import 'package:projetofinal/BD.dart';
 import 'package:projetofinal/uson.dart';
 import 'package:image_picker/image_picker.dart';
-import 'dart:io';
+// A LINHA 'import 'dart:io';' FOI REMOVIDA DAQUI
+
 
 import 'package:projetofinal/aba_pedidos_entregador.dart';
+
 import 'package:projetofinal/abaEntregador.dart';
-import 'package:projetofinal/cardapio.dart'; // ADIÇÃO 1: IMPORTAÇÃO DO CARDÁPIO
+
+import 'package:projetofinal/cardapio.dart';
 
 
   class del extends StatelessWidget {
@@ -560,24 +560,23 @@ class DT extends StatelessWidget {
                 ),
               ),
             Spacer(),
-
-            // ADIÇÃO 3: BOTÃO PARA VER O CARDÁPIO
             Center(
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.white,
-                  foregroundColor: Colors.redAccent,
+                  backgroundColor: Colors.white, // Cor do botão
+                  foregroundColor: Colors.redAccent, // Cor do texto
                   padding: EdgeInsets.symmetric(horizontal: 32, vertical: 12),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
                 ),
                 onPressed: () {
-                  // Navega para a tela do cardápio
-                  Navigator.pushNamed(context, Cardapio.routeName);
+                  // Ação ao clicar no botão
                 },
-                child: Text('Ver Cardápio'),
+                child: Text('Ver menu'),
               ),
             ),
-            SizedBox(height: 10), // Espaço entre os botões
-
+            Spacer(),
             Center(
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
@@ -691,22 +690,24 @@ class _CreatePropertyScreenState extends State<CreatePropertyScreen> {
     'cep': TextEditingController(),
   };
 
-  final List<File> _imageFiles = []; // Lista para armazenar as imagens selecionadas
-  final ImagePicker _picker = ImagePicker(); // Instância para pegar imagens
+  // A lista de 'File' foi removida pois não é compatível com a web.
+  // final List<File> _imageFiles = []; 
+  final ImagePicker _picker = ImagePicker();
 
-  // Método para adicionar um novo campo de imagem
-  void _addImageField() {
+  // Esta função foi desativada para a web.
+  void addImageField() {
     setState(() {
-      _imageFiles.add(File('')); // Adiciona um novo "campo" de imagem (vazio)
+      // _imageFiles.add(File('')); 
     });
   }
 
-  // Método para selecionar uma imagem da galeria
-  Future<void> _pickImage(int index) async {
+  // Esta função foi desativada para a web.
+  Future<void> pickImage(int index) async {
     final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
     if (pickedFile != null) {
       setState(() {
-        _imageFiles[index] = File(pickedFile.path); // Atribui a imagem escolhida à posição na lista
+        // A linha abaixo usa 'File' e não é compatível com a web.
+        // _imageFiles[index] = File(pickedFile.path); 
       });
     }
   }
@@ -752,7 +753,8 @@ class _CreatePropertyScreenState extends State<CreatePropertyScreen> {
 
                 SizedBox(height: 20),
 
-                // Seção de imagens adicionais
+                // A seção de imagens foi desativada para a web
+                _buildImagePicker(),
 
                 // Botão de submissão do formulário
                 _buildSubmitButton(),
@@ -791,50 +793,10 @@ class _CreatePropertyScreenState extends State<CreatePropertyScreen> {
     );
   }
 
-  // Widget para exibir e selecionar as imagens
+  // Widget para exibir e selecionar as imagens (desativado para a web)
   Widget _buildImagePicker() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          '',
-          style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: Colors.white),
-        ),
-        SizedBox(height:1),
-        ..._imageFiles.asMap().entries.map((entry) {
-          int index = entry.key;
-          File file = entry.value;
-          return Padding(
-            padding: const EdgeInsets.symmetric(vertical: 8.0),
-            child: Column(
-              children: [
-                file.path.isEmpty
-                    ? Container(
-                        height: 100,
-                        decoration: BoxDecoration(
-                          color: Colors.grey[700],
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Center(child: Text('Nenhuma imagem selecionada.', style: TextStyle(color: Colors.white))),
-                      )
-                    : Image.file(file, height: 100, fit: BoxFit.cover),
-                TextButton(
-                  onPressed: () => _pickImage(index),
-                  child: Text('Selecionar Imagem', style: TextStyle(color: Colors.blue)),
-                ),
-              ],
-            ),
-          );
-        }).toList(),
-        TextButton(
-          onPressed: _addImageField,
-          child: Text(
-            '',
-            style: TextStyle(color: Colors.blue),
-          ),
-        ),
-      ],
-    );
+    // Retornando um widget vazio para não mostrar a funcionalidade na web.
+    return Container();
   }
 
   // Botão de envio do formulário
@@ -853,7 +815,7 @@ class _CreatePropertyScreenState extends State<CreatePropertyScreen> {
               int.parse(_controllers['maxGuests']!.text),
               _controllers['thumbnail']!.text,
               _controllers['cep']!.text,
-              _imageFiles.where((file) => file.path.isNotEmpty).map((file) => file.path).toList(),
+              [], // Enviando uma lista vazia de imagens, pois a função foi desativada para a web
             );
             // Removido o SnackBar
             Navigator.pushReplacement(
@@ -1178,7 +1140,6 @@ class lisl extends StatelessWidget {
 }
 
 // criação de novo usuario +_+
-// [ALTERAÇÃO 3]: Tela de criação de usuário agora tem um switch para definir o tipo de conta.
 class CNU extends StatefulWidget {
   @override
   _CNUState createState() => _CNUState();
@@ -1189,7 +1150,6 @@ class _CNUState extends State<CNU> {
   final _nameController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
-  bool _isEntregador = false; // Estado para o switch de entregador
 
   @override
   void dispose() {
@@ -1206,8 +1166,7 @@ class _CNUState extends State<CNU> {
       String email = _emailController.text;
       String password = _passwordController.text;
       var db = DBADMN();
-      // Passa o valor do switch para a função de inserção
-      var userCreated = await db.insertUser(name, email, password, _isEntregador);
+      var userCreated = await db.insertUser(name, email, password);
       if (userCreated) {
         // Retirado o SnackBar
         Navigator.pop(context);
@@ -1221,9 +1180,8 @@ class _CNUState extends State<CNU> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Criar nova conta', style: TextStyle(color: const Color.fromARGB(255, 0, 0, 0))),
+        title: Text('Criar nova conta', style: TextStyle(color: Colors.white)),
         backgroundColor: const Color.fromARGB(255, 255, 255, 255),
-        iconTheme: IconThemeData(color: Colors.black),
       ),
       backgroundColor: const Color.fromARGB(255, 255, 255, 255),
       body: SingleChildScrollView(  // Adicionando rolagem
@@ -1321,32 +1279,12 @@ class _CNUState extends State<CNU> {
                       return null;
                     },
                   ),
-                  SizedBox(height: 20),
-                  // Switch para registrar como entregador
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        'Registrar como Entregador',
-                        style: TextStyle(color: const Color.fromARGB(255, 0, 0, 0)),
-                      ),
-                      Switch(
-                        value: _isEntregador,
-                        onChanged: (value) {
-                          setState(() {
-                            _isEntregador = value;
-                          });
-                        },
-                         activeColor: const Color.fromARGB(255, 243, 33, 33),
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 20),
+                  SizedBox(height: 40),
                   ElevatedButton(
                     onPressed: _submitForm,
                     child: Text(
                     'Criar Conta',
-                    style: TextStyle(color: Colors.white),
+                    style: TextStyle(color: Colors.black),
                     ),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color.fromARGB(255, 243, 33, 33),
@@ -1453,7 +1391,6 @@ class _posloginState extends State<poslogin> {
 }
 
 // responsavel pela tela de login +_+
-// [ALTERAÇÃO 4]: Tela de login agora é unificada e redireciona o usuário com base no seu tipo.
 class TLG extends StatefulWidget {
   @override
   _TLGState createState() => _TLGState();
@@ -1477,31 +1414,14 @@ class _TLGState extends State<TLG> {
       if (user != null) {
         int userId = user['id'];
         ONU().setUser(userId);
-        
-        // LÓGICA DE REDIRECIONAMENTO
-        // Verifica se o usuário é um entregador (is_entregador == 1)
-        if (user['is_entregador'] == 1) {
-          // Navega para a tela de entregador
-          Navigator.pushNamed(
-            context,
-            Abaentregador.routeName,
-            arguments: {'nome': username},
-          );
-        } else {
-          // Navega para a tela de usuário comum
-          Navigator.pushNamed(context, '/intermed');
-        }
-
+        // Retirado o SnackBar
+        Navigator.pushNamed(context, '/intermed');
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Nome de usuário ou senha inválidos.')),
-        );
+        // Retirado o SnackBar
       }
     } catch (e) {
       print("Erro ao validar login: $e");
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Ocorreu um erro durante o login.')),
-      );
+      // Retirado o SnackBar
     }
   }
 
@@ -1564,7 +1484,16 @@ class _TLGState extends State<TLG> {
                 // Retirado o SnackBar
               },
             ),
-            // Item 'Sou Entregador' removido daqui, pois o login agora é unificado.
+            ListTile(
+              leading: Icon(Icons.delivery_dining, color: const Color.fromARGB(255, 0, 0, 0)),
+              title: Text(
+                'Sou Entregador',
+                style: TextStyle(color: const Color.fromARGB(255, 0, 0, 0)),
+              ),
+              onTap: () {
+                Navigator.pushNamed(context, Abaentregador.routeName);
+              },
+            ),
           ],
         ),
       ),
@@ -1618,7 +1547,7 @@ class _TLGState extends State<TLG> {
                     return null;
                   },
                 ),
-                SizedBox(height: 40), // Aumentado o espaçamento
+                SizedBox(height: 20),
                 ElevatedButton(
                   onPressed: () {
                     if (_formKey.currentState!.validate()) {
@@ -1627,7 +1556,25 @@ class _TLGState extends State<TLG> {
                   },
                   child: Text(
                   'Entrar',
-                  style: TextStyle(color: Colors.white),
+                  style: TextStyle(color: Colors.black),
+                  ),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color.fromARGB(255, 255, 0, 0),
+                    padding: EdgeInsets.symmetric(vertical: 16.0, horizontal: 40.0),
+                    textStyle: TextStyle(fontSize: 16, color: const Color.fromARGB(255, 0, 0, 0)),
+                  ),
+                ),
+                SizedBox(height: 20),
+                ElevatedButton(
+                  onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => Cardapio()),
+                  );
+                  },
+                  child: Text(
+                  'Cardápio',
+                  style: TextStyle(color: Colors.black),
                   ),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color.fromARGB(255, 255, 0, 0),
@@ -1653,20 +1600,7 @@ class _TLGState extends State<TLG> {
 
 
 // codigo main +_+
-void main() {
-  // Inicialização condicional do banco de dados dependendo da plataforma
-  if (kIsWeb) {
-    // Se a plataforma for WEB, usa a implementação web do banco.
-    databaseFactory = databaseFactoryFfiWeb;
-  } else {
-    // Para plataformas DESKTOP (Windows, macOS, Linux), usa a implementação FFI.
-    sqfliteFfiInit();
-    databaseFactory = databaseFactoryFfi;
-  }
-
-  // Inicia o aplicativo Flutter, executando o widget Main
-  runApp(Main());
-}
+void main() => runApp(Main()); // Inicia o aplicativo Flutter, executando o widget Main
 
 class Main extends StatelessWidget {
   const Main({super.key});
@@ -1701,24 +1635,17 @@ class Main extends StatelessWidget {
       '/create_prop': (context) => CreatePropertyScreen(), // Tela para criar uma propriedade
       '/list_prop': (context) => lisl(), // Tela para listar propriedades
       '/edit_prop': (context) => edt(), // Tela para editar propriedades
-      '/each_prop': (context) => DT(), // Tela de detalhes de uma propriedade
-      '/delete_prop': (context) => del(), // Tela de deletar uma propriedade
+      '/each_prop': (context) => DT(), // Tela de detalhes de uma propriedadez
+      '/delete_prop': (context) => del(),// Tela de deletar uma propriedade
       
-      // ADIÇÃO 2: ROTA PARA O CARDÁPIO
-      Cardapio.routeName: (context) => Cardapio(),
-
       // Rotas adicionadas para o entregador
-      // CORREÇÃO: A rota agora extrai os argumentos para passar o nome do entregador dinamicamente.
-      Abaentregador.routeName: (context) {
-        final args = ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
-        final nome = args['nome'] as String;
-         // CORREÇÃO APLICADA AQUI
-        return Abaentregador(nome: nome);
-      },
-      AbaPedidosEntregador.routeName: (context) =>
-          AbaPedidosEntregador(), // Rota para a lista de pedidos
+      Abaentregador.routeName: (context) => Abaentregador.name("Nome do Entregador"), // Rota para a tela do entregador
+      AbaPedidosEntregador.routeName: (context) => AbaPedidosEntregador(), // Rota para a lista de pedidos
+
+      '/Cardapio': (context) => Cardapio() // Rota para o cardápio
     };
   }
+
   // Função para lidar com rotas desconhecidas
   MaterialPageRoute _handleUnknownRoute(RouteSettings settings) {
     return MaterialPageRoute(
