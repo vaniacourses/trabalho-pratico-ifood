@@ -1,72 +1,20 @@
 import 'package:flutter/material.dart';
-import 'package:projetofinal/BD.dart';
+import 'package:projetofinal/BD.dart'; // Importa o arquivo do banco de dados
 
-/// Modelo de dados
+// Modelo de dados para um Pedido
 class Pedido {
-  final int id;
+  final int id; // ID agora é um inteiro, como no banco de dados
   final String nomeCliente;
   final String endereco;
   final String status;
 
-  Pedido({
-    required this.id,
-    required this.nomeCliente,
-    required this.endereco,
-    required this.status,
-  });
+  Pedido({required this.id, required this.nomeCliente, required this.endereco, required this.status});
 }
 
-/// Interface Strategy
-abstract class StatusStyleStrategy {
-  Color getColor();
-}
-
-class PendenteStrategy implements StatusStyleStrategy {
-  @override
-  Color getColor() => Colors.orange;
-}
-
-class EmTransitoStrategy implements StatusStyleStrategy {
-  @override
-  Color getColor() => Colors.blue;
-}
-
-class EntregueStrategy implements StatusStyleStrategy {
-  @override
-  Color getColor() => Colors.green;
-}
-
-class DesconhecidoStrategy implements StatusStyleStrategy {
-  @override
-  Color getColor() => Colors.grey;
-}
-
-class StatusStyleContext {
-  late StatusStyleStrategy _strategy;
-
-  StatusStyleContext(String status) {
-    _strategy = _selectStrategy(status);
-  }
-
-  StatusStyleStrategy _selectStrategy(String status) {
-    switch (status) {
-      case 'Pendente':
-        return PendenteStrategy();
-      case 'Em trânsito':
-        return EmTransitoStrategy();
-      case 'Entregue':
-        return EntregueStrategy();
-      default:
-        return DesconhecidoStrategy();
-    }
-  }
-
-  Color getColor() => _strategy.getColor();
-}
-
-/// Widget principal
+// ignore: must_be_immutable
 class AbaPedidosEntregador extends StatefulWidget {
   AbaPedidosEntregador({super.key});
+
   static const String routeName = "/AbaPedidosEntregador";
 
   @override
@@ -74,18 +22,22 @@ class AbaPedidosEntregador extends StatefulWidget {
 }
 
 class _AbaPedidosEntregadorState extends State<AbaPedidosEntregador> {
+  // Futuro que conterá a lista de pedidos vinda do banco de dados
   late Future<List<Pedido>> _pedidosFuture;
 
   @override
   void initState() {
     super.initState();
+    // Inicia a busca pelos pedidos assim que a tela é carregada
     _pedidosFuture = _fetchPedidos();
   }
 
+  // Função para buscar e converter os pedidos do banco de dados
   Future<List<Pedido>> _fetchPedidos() async {
     final dbHelper = DBADMN();
     final List<Map<String, dynamic>> maps = await dbHelper.getAllPedidos();
 
+    // Converte a lista de Mapas em uma lista de Pedidos
     return List.generate(maps.length, (i) {
       return Pedido(
         id: maps[i]['id'],
@@ -103,40 +55,42 @@ class _AbaPedidosEntregadorState extends State<AbaPedidosEntregador> {
       appBar: AppBar(
         centerTitle: true,
         backgroundColor: Colors.black,
-        title: Text("Pedidos", style: TextStyle(color: Colors.white)),
+        title: Text(
+          "Pedidos",
+          style: TextStyle(color: Colors.white),
+        ),
         iconTheme: IconThemeData(color: Colors.white),
       ),
+      // Usa FutureBuilder para lidar com os dados assíncronos
       body: FutureBuilder<List<Pedido>>(
         future: _pedidosFuture,
         builder: (context, snapshot) {
+          // Enquanto os dados estão carregando, mostra um indicador de progresso
           if (snapshot.connectionState == ConnectionState.waiting) {
             return Center(child: CircularProgressIndicator());
-          } else if (snapshot.hasError) {
-            return Center(
-              child: Text("Erro ao carregar pedidos: ${snapshot.error}",
-                  style: TextStyle(color: Colors.white)),
-            );
-          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return Center(
-              child:
-                  Text("Nenhum pedido encontrado", style: TextStyle(color: Colors.white)),
-            );
-          } else {
+          } 
+          // Se ocorrer um erro na busca
+          else if (snapshot.hasError) {
+            return Center(child: Text("Erro ao carregar pedidos: ${snapshot.error}", style: TextStyle(color: Colors.white)));
+          } 
+          // Se os dados foram carregados com sucesso, mas a lista está vazia
+          else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+            return Center(child: Text("Nenhum pedido encontrado", style: TextStyle(color: Colors.white)));
+          } 
+          // Se os dados foram carregados com sucesso
+          else {
             final pedidos = snapshot.data!;
             return ListView.builder(
               itemCount: pedidos.length,
               itemBuilder: (context, index) {
                 final pedido = pedidos[index];
-                final color = StatusStyleContext(pedido.status).getColor();
-
                 return Card(
                   color: Colors.grey[900],
                   margin: EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
                   child: ListTile(
                     title: Text(
                       "Cliente: ${pedido.nomeCliente}",
-                      style:
-                          TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                      style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
                     ),
                     subtitle: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -149,7 +103,10 @@ class _AbaPedidosEntregadorState extends State<AbaPedidosEntregador> {
                         SizedBox(height: 4.0),
                         Text(
                           "Status: ${pedido.status}",
-                          style: TextStyle(color: color, fontWeight: FontWeight.bold),
+                          style: TextStyle(
+                            color: _getStatusColor(pedido.status),
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ],
                     ),
@@ -165,5 +122,19 @@ class _AbaPedidosEntregadorState extends State<AbaPedidosEntregador> {
         },
       ),
     );
+  }
+
+  // Função auxiliar para definir a cor do status
+  Color _getStatusColor(String status) {
+    switch (status) {
+      case 'Pendente':
+        return Colors.orange;
+      case 'Em trânsito':
+        return Colors.blue;
+      case 'Entregue':
+        return Colors.green;
+      default:
+        return Colors.grey;
+    }
   }
 }
